@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+:root {
+  --bg-page: #ffffff;
+  --bg-subtle: #f5f6f8;
+  --bg-banner: #fafbfc;
+  --border-hairline: #e6e8ec;
+  --ink-primary: #111827;
+  --ink-secondary: #4b5563;
+  --ink-muted: #7b8494;
+  --chart-blue: #2573c2;
+  --chart-slate: #334155;
+  --chart-ma: #aeb6c2;
+  --zone-red-bg: rgba(220, 38, 38, 0.085);
+  --zone-red-ink: #b91c1c;
+  --zone-green-bg: rgba(22, 163, 74, 0.095);
+  --zone-green-ink: #15803d;
+}
+
+@theme inline {
+  --color-background: var(--bg-page);
+  --color-foreground: var(--ink-primary);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, monospace;
+}
+
+html {
+  scroll-behavior: smooth;
+  color-scheme: light;
+}
+
+body {
+  background: var(--bg-page);
+  color: var(--ink-primary);
+  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Recharts tooltip crisp styling */
+.recharts-default-tooltip {
+  border-radius: 10px !important;
+  border: 1px solid #e5e7eb !important;
+  box-shadow: 0 8px 24px -4px rgba(17, 24, 39, 0.1) !important;
+  font-size: 12px !important;
+}

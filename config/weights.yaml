@@ -1,0 +1,112 @@
+# ==============================================================================
+# MacroCompass (Edición Growth & Tech) — Pesos, Umbrales y Playbook
+# Todos los módulos se normalizan en [0, 100]:
+#   0   = Capitulación / Compra fuerte (banda verde < 20)
+#   100 = Euforia / Toma de beneficios (banda roja > 80)
+# ==============================================================================
+
+weights:
+  liquidity: 0.20          # Módulo 1: Liquidez Neta Fed + NFCI
+  real_rates: 0.15         # Módulo 2: Tipos Reales (DFII10), T10Y2Y y Sahm
+  tech_extension: 0.15     # Módulo 3: Sobreextensión QQQ, SMH e IWF/IWD
+  market_breadth: 0.15     # Módulo 4: Amplitud RSP/SPY, QQQE/QQQ y 11 sectores
+  volatility: 0.15         # Módulo 5: ^VXN y Estructura Temporal ^VIX/^VIX3M
+  price_of_risk: 0.10      # Módulo 6: US High Yield OAS y US BBB OAS
+  cyclicals_defensives: 0.10 # Módulo 7: Cíclicos vs Defensivos + XLK/XLP
+
+# Retardos de publicación causales para evitar look-ahead bias en el backtest
+publication_lags:
+  WALCL:
+    unit: business_days
+    lag: 1
+  WTREGEN:
+    unit: business_days
+    lag: 1
+  NFCI:
+    unit: business_days
+    lag: 3
+  SAHMREALTIME:
+    unit: calendar_days
+    lag: 35
+  RRPONTSYD:
+    unit: business_days
+    lag: 0
+  DFII10:
+    unit: business_days
+    lag: 0
+  T10Y2Y:
+    unit: business_days
+    lag: 0
+  BAMLH0A0HYM2:
+    unit: business_days
+    lag: 0
+  BAMLC0A4CBBB:
+    unit: business_days
+    lag: 0
+
+thresholds:
+  # Módulo 2: Tipos reales y ciclo
+  real_rates_shock_bp: 35.0
+  sahm_recession: 0.50
+
+  # Módulo 3: Sobreextensión Tech & Semis
+  qqq_euphoria_pct: 16.0
+  smh_euphoria_pct: 25.0
+  iwf_iwd_euphoria: 85.0
+  qqq_capitulation_pct: -10.0
+  smh_capitulation_pct: -15.0
+
+  # Módulo 4: Divergencia bajista de amplitud
+  qqq_near_high_pct: 0.97        # QQQ dentro del 3% de su máximo de 3M (63d)
+  qqqe_qqq_1m_drop_pct: -1.5     # Caída 1M de QQQE/QQQ
+
+  # Módulo 5: Volatilidad Nasdaq
+  vxn_complacency: 17.0
+  term_complacency: 0.85
+  vxn_capitulation: 32.0
+  term_capitulation: 1.00
+
+  # Módulo 6: Precio del riesgo (alerta prioritaria de compra)
+  hy_priority_buy_bp: 500.0
+  bbb_priority_buy_bp: 130.0
+
+early_warning_tech:
+  min_conditions: 3
+  qqq_sma200_pct: 15.0
+  smh_sma200_pct: 22.0
+  vxn_below: 17.5
+  net_liq_3m_below_pct: 0.0
+  dfii10_rise_bp: 30.0
+  iwf_iwd_above: 85.0
+
+regimes:
+  - key: euforia_extrema
+    label: "Euforia extrema"
+    min_score: 80
+    max_score: 100
+    color: "red"
+    playbook: "Prohibido comprar por FOMO. Recortar 15–30% de posiciones de beta alta/semis, subir liquidez o rotar parcialmente a defensivos/renta fija corta."
+  - key: calentamiento
+    label: "Calentamiento"
+    min_score: 65
+    max_score: 79.9999
+    color: "amber"
+    playbook: "Riesgo asimétrico a la baja en growth. No añadir capital nuevo; subir stops dinámicos en ganadoras extendidas."
+  - key: neutral
+    label: "Neutral"
+    min_score: 35
+    max_score: 64.9999
+    color: "slate"
+    playbook: "Régimen normal. Mantener posiciones y aportar solo en tesis individuales claras."
+  - key: miedo_estres
+    label: "Miedo / Estrés"
+    min_score: 20
+    max_score: 34.9999
+    color: "teal"
+    playbook: "Prohibido vender por pánico. Preparar órdenes escalonadas en líderes de calidad."
+  - key: capitulacion
+    label: "Capitulación"
+    min_score: 0
+    max_score: 19.9999
+    color: "green"
+    playbook: "Ventana histórica de compra en tech/growth. Desplegar caja en 3–4 tramos (si Sahm >= 0.50, espaciar los tramos varias semanas)."
